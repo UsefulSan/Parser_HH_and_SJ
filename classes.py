@@ -1,30 +1,40 @@
 from abc import abstractmethod, ABC
+from math import ceil
 
 import requests
 
 
 class Engine(ABC):
+    """
+    Абстрактный класс для поисковых систем
+    """
+
     @abstractmethod
     def get_request(self):
         pass
 
 
 class HH(Engine):
-    def __init__(self, name_job, quantity):
-        self.text = name_job
-        self.iter = int(quantity / 100)
-        self.url = 'https://api.hh.ru/vacancies'
+    """
+    Класс Head Hunter
+    """
 
-    def get_request(self, page):
-        url = self.url + self.text
-        param = {'text': self.text, 'page': page, 'pre_page': 100, 'area': 113}
-        response = requests.get(self.url, params=param)
-        return response
+    def __init__(self, name_job: str, quantity):
+        self.text = name_job
+        self.iter = ceil(float(quantity) / 100)
+        self.url = 'https://api.hh.ru/vacancies/'
+
+    def get_request(self, page: int):
+        param = {'text': self.text, 'page': page, 'per_page': 100, 'area': 113}
+        return requests.get(self.url, params=param)
 
 
 class Superjob(Engine):
+    """
+    Класс Superjob
+    """
 
-    def __init__(self, name_job):
+    def __init__(self, name_job: str):
         self.text = name_job
         self.url = 'https://russia.superjob.ru/vacancy/search/?keywords='
 
@@ -35,7 +45,7 @@ class Superjob(Engine):
 
 
 class Vacancy():
-    def __init__(self, title, reference, description, salary, hh=False):
+    def __init__(self, title: str, reference: str, description: str, salary: str, hh=False):
         # self.data = data
         self.hh = hh
         self.title = title
