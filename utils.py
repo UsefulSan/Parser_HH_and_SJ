@@ -1,4 +1,5 @@
 import json
+import re
 from operator import itemgetter
 
 from bs4 import BeautifulSoup
@@ -14,52 +15,41 @@ def save_vacs(data: list) -> None:
 
 def get_hh_vac(req_text, how_many):
     hh = HH(req_text, how_many)
-    data = hh.get_request(how_many)
-    json_res = json.loads(data.text)
     vacancies = []
-    # for page in range(hh.iter):
-    #     data = hh.get_request(page)
-    #     json_res = json.loads(data.text)
-    #     for vac in json_res['items']:
-    #         vacancies.append(Vacancy(vac, hh=True))
-    # save_vacs(vacancies)
-    # for i in range(0, how_many):
-    for vac in json_res['items']:
-        name = vac['name']
-
-        reference = vac['alternate_url']
-        if vac['snippet']['requirement'] and vac['snippet']['responsibility']:
-            description = vac['snippet']['requirement'] + vac['snippet']['responsibility']
-        else:
+    for page in range(hh.iter):
+        data = hh.get_request(page)
+        json_res = json.loads(data.text)
+        for vac in json_res['items']:
+            name = vac['name']
+            reference = vac['alternate_url']
+            if vac['snippet']['requirement'] and vac['snippet']['responsibility']:
+                description = vac['snippet']['requirement'] + vac['snippet']['responsibility']
+            else:
+                try:
+                    description = vac['snippet']['requirement']
+                except:
+                    description = vac['snippet']['responsibility']
             try:
-                description = vac['snippet']['requirement']
+                salary = vac['salary']['from']
             except:
-                description = vac['snippet']['responsibility']
-        try:
-            salary = vac['salary']['from']
-        except:
-            salary = 0
-        vacancies.append(Vacancy(name, reference, description, salary))
-    save_vacs(vacancies)
+                salary = 0
+            vacancies.append(Vacancy(name, reference, description, salary))
+        save_vacs(vacancies)
 
 
 def get_sj_vac(name_job):
     vac = []
     sj = Superjob('python')
     response = sj.get_request()
-    soup = BeautifulSoup(response.text, 'lxml')
+    soup = BeautifulSoup(response.text, 'html.parser')
     quotes = soup.find_all('span', class_="_9fIP1 _249GZ _1jb_5 QLdOc")
     title = soup.find_all('span', class_="_9fIP1 _249GZ _1jb_5 QLdOc")
     description = soup.find_all('span', class_="_1Nj4W _249GZ _1jb_5 _1dIgi _3qTky")
     salary = soup.find_all('span', class_="_2eYAG _1nqY_ _249GZ _1jb_5 _1dIgi")
     for i in range(0, len(quotes)):
         name = title[i].find('a', href=True)
-        vac.append(Vacancy(quotes[i].text, name['href'], description[i].text, salary[i].text))
+        vac.append(Vacancy(quotes[i].text, name['href'], description[i].text, (re.sub('[^0-9]', '', salary[i].text))))
     save_vacs(vac)
-
-
-# print(get_sj_vac('python'))
-# print(get_hh_vac('python', 50))
 
 
 def read_all():
