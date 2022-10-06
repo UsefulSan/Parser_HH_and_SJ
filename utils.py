@@ -8,12 +8,21 @@ from classes import HH, Superjob, Vacancy
 
 
 def save_vacs(data: list) -> None:
+    """
+    Сохраняет обработанные вакансии в тхт файл
+    :param data: принимаемые данные
+    """
     with open('vacancies.txt', 'a', encoding='utf-8') as file:
         for d in data:
             file.write(d.__repr__() + '\n')
 
 
-def get_hh_vac(req_text, how_many):
+def get_hh_vac(req_text: str, how_many: str) -> None:
+    """
+    Забирает данные с сайта HH и обрабатывает их
+    :param req_text: наименование профессии
+    :param how_many: количество обрабатываемых вакансий
+    """
     hh = HH(req_text, how_many)
     vacancies = []
     for page in range(hh.iter):
@@ -37,7 +46,11 @@ def get_hh_vac(req_text, how_many):
         save_vacs(vacancies)
 
 
-def get_sj_vac(name_job):
+def get_sj_vac(name_job: str) -> None:
+    """
+    Забирает данные с сайта Superjob и обрабатывает их
+    :param name_job: наименование профессии
+    """
     vac = []
     sj = Superjob('python')
     response = sj.get_request()
@@ -53,6 +66,9 @@ def get_sj_vac(name_job):
 
 
 def read_all():
+    """
+    Читает файл vacancies.txt и выводит отформатированные все строки
+    """
     with open('vacancies.txt', 'r', encoding='utf-8') as file:
         for line in file:
             line_list = line.split('|')
@@ -61,6 +77,10 @@ def read_all():
 
 
 def top_10():
+    """
+    Читает файл vacancies.txt и выводит топ 10 вакансий отсортированных по наибольшей заработной плате
+    :return:
+    """
     with open('vacancies.txt', 'r', encoding='utf-8') as file:
         some_list = []
         for line in file:
