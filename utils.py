@@ -1,6 +1,9 @@
 import json
-from classes import HH, Superjob, Vacancy
+from operator import itemgetter
+
 from bs4 import BeautifulSoup
+
+from classes import HH, Superjob, Vacancy
 
 
 def save_vacs(data: list) -> None:
@@ -11,30 +14,33 @@ def save_vacs(data: list) -> None:
 
 def get_hh_vac(req_text, how_many):
     hh = HH(req_text, how_many)
-    vac = []
+    data = hh.get_request(how_many)
+    json_res = json.loads(data.text)
+    vacancies = []
     # for page in range(hh.iter):
     #     data = hh.get_request(page)
     #     json_res = json.loads(data.text)
     #     for vac in json_res['items']:
     #         vacancies.append(Vacancy(vac, hh=True))
     # save_vacs(vacancies)
-    for i in range(0, how_many):
+    # for i in range(0, how_many):
+    for vac in json_res['items']:
+        name = vac['name']
 
-        name = self.data['name']
-        reference = self.data['alternate_url']
-        if self.data['snippet']['requirement'] + self.data['snippet']['responsibility']:
-            description = self.data['snippet']['requirement'] + self.data['snippet']['responsibility']
+        reference = vac['alternate_url']
+        if vac['snippet']['requirement'] and vac['snippet']['responsibility']:
+            description = vac['snippet']['requirement'] + vac['snippet']['responsibility']
         else:
             try:
-                description = self.data['snippen']['requirement']
+                description = vac['snippet']['requirement']
             except:
-                description = self.data['snippet']['responsibility']
+                description = vac['snippet']['responsibility']
         try:
-            salary = self.data['salary']['from']
+            salary = vac['salary']['from']
         except:
             salary = 0
-        vac.append(Vacancy(name, reference, description, salary))
-    save_vacs(vac)
+        vacancies.append(Vacancy(name, reference, description, salary))
+    save_vacs(vacancies)
 
 
 def get_sj_vac(name_job):
@@ -52,10 +58,31 @@ def get_sj_vac(name_job):
     save_vacs(vac)
 
 
-print(get_sj_vac('python'))
+# print(get_sj_vac('python'))
 # print(get_hh_vac('python', 50))
 
-def load_vacancy(data: list):
-    with open('vacancy.txt', 'a', encoding='utf-8') as file:
-        for d in data:
-            file.write(d.__repr__() + '\n')
+
+def read_all():
+    with open('vacancies.txt', 'r', encoding='utf-8') as file:
+        for line in file:
+            line_list = line.split('|')
+            print(line_list[0].replace("'", ""), '\n', line_list[1], '\n', line_list[2], '\n',
+                  line_list[3].replace("'", ""), sep='')
+
+
+def top_10():
+    with open('vacancies.txt', 'r', encoding='utf-8') as file:
+        some_list = []
+        for line in file:
+            line_list = line.split('|')
+            line_list[0] = line_list[0].replace("'", "")
+            try:
+                line_list[3] = int(line_list[3].replace("'", ''))
+            except ValueError:
+                line_list[3] = 0
+            some_list.append(line_list)
+        sorted_list = sorted(some_list, key=itemgetter(3), reverse=True)
+        for i in range(10):
+            for list in sorted_list[i]:
+                print(list)
+            print('\n')
