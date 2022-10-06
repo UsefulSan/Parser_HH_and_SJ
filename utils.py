@@ -61,7 +61,7 @@ def get_sj_vac(name_job: str) -> None:
     salary = soup.find_all('span', class_="_2eYAG _1nqY_ _249GZ _1jb_5 _1dIgi")
     for i in range(0, len(quotes)):
         name = title[i].find('a', href=True)
-        vac.append(Vacancy(quotes[i].text, name['href'], description[i].text, (re.sub('[^0-9]', '', salary[i].text))))
+        vac.append(Vacancy(quotes[i].text, name['href'], description[i].text, (re.sub('[^0-9\—]', '', salary[i].text))))
     save_vacs(vac)
 
 
@@ -89,7 +89,10 @@ def top_10():
             try:
                 line_list[3] = int(line_list[3].replace("'", ''))
             except ValueError:
-                line_list[3] = 0
+                try:
+                    line_list[3] = int(line_list[3].split('—')[0])
+                except ValueError:
+                    line_list[3] = 0
             some_list.append(line_list)
         sorted_list = sorted(some_list, key=itemgetter(3), reverse=True)
         for i in range(10):
