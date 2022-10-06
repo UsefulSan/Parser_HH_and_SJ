@@ -1,41 +1,27 @@
-from classes import Superjob
-
-def main():
-    name_job = input('Введите название вакансии')
-    sj = Superjob()
-    sj.get_request(name_job)
-
-
-if __name__ == "__main__":
-    main()
-
-from utils import *
+from utils import get_hh_vac, get_sj_vac, read_all, top_10
 
 
 def main():
     while True:
-        user_input = input('Выберите действие:\n1. Сформировать файл с вакансиями с HH и Superjob\n2. Вывести список '
-                           'из вакансий c HH\n3. Вывести список вакансии с SJ\nВвод: ')
-        if int(user_input) == 1:
-            vacancy_1 = hh_data()
-            load_vacancy(vacancy_1)
-            vacancy_2 = sj_data()
-            load_vacancy(vacancy_2)
-            print('Файл загружен!')
-        if int(user_input) == 2:
-            vacancy_1 = hh_data()
-            for i in range(5):
-                print(i+1, vacancy_1[i])
-        if int(user_input) == 3:
-            vacancy_2 = sj_data()
-            for i in range(5):
-                print(i + 1, vacancy_2[i])
+        user_input = input('Выберите действие:\n'
+                           '1. Загрузить список вакансий с HH\n'
+                           '2. Загрузить список вакансий с SJ\n'
+                           '3. Вывести все загруженные вакансии\n'
+                           '4. Вывести топ 10 вакансий по заработной плате\n'
+                           '>>> ')
+        match user_input:
+            case '1':
+                text_input = input('Введите название должности\n' '>>> ')
+                numb_input = input('Введите количество искомых вакансий\n' '>>> ')
+                get_hh_vac(text_input, numb_input)
+            case '2':
+                text_input = input('Введите название должности\n' '>>> ')
+                get_sj_vac(text_input)
+            case '3':
+                read_all()
+            case '4':
+                top_10()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-
-
-
-
