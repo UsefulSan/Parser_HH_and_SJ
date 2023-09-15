@@ -5,6 +5,6 @@
 ## Для запуска приложения:
  - клонировать репозиторий git clone https://github.com/UsefulSan/course_work_1.git
  - добавить python интерпретатор 
- - установите зависимости `pip freeze > requirements.txt` 
+ - установите зависимости `pip install -r requirements.txt` 
  - запустить `py main.py` 
  - следовать подсказкам из терминала
